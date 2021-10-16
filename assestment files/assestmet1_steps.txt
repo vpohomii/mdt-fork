@@ -1,0 +1,208 @@
+1.  Spin up VM on AWS. /Amazon linux/ Publick IPv4 3.120.115.201
+2.	Install nginx and git
+    sudo yum update
+    sudo yum install -y git
+	sudo amazon-linux-extras install nginx1
+	sudo systemctl enable nginx1	
+	copy defaulf nginx webpage to site location -> /var/www/
+	check that web page is visible on external IPv4 address http://3.120.115.201/
+	run command ssh-keygen choose parameters, then cat ~/.ssh/id_rsa.pub copy content and add it to github settings.
+3.  fork repo https://github.com/joashp/material-design-template from the web page
+	rename repo to https://github.com/vpohomii/mdt-fork
+	create folder mkdir ~/assestment1
+	clone repo
+	run  command cd ./assestment1;  git clone git@github.com:vpohomii/mdt-fork.git  .
+4.  create file run.sh for crontab
+	
+	#!/bin/bash
+	cd ${HOME}/assestment1/ ; git checkout master ; git pull origin master&& echo Script running at  $(date +'%d-%m-%Y %H-%M-%S')   >> ${HOME}/test.txt || echo Script not working for some reaseon at $(date +'%d-%m-%Y %H-%M-%S') >> ${HOME}/test.txt
+	and make it executable chmod +x run.sh
+	make permission to user folder sudo chmod go+rx /home/ec2-user
+	create schedule for crontab crontab -e
+	
+	* * * * * /home/ec2-user/assestment1/run.sh
+
+	checkout that crontab schedule is working
+	# photo and text file in assestment files folder
+5.  run vi ./www/index.html and make changes on line 30 > <a href="#" id="logo-container" class="brand-logo">MD Template by Vasyl Pohomiy</a>
+	change name for default folder /var/www -> var/www1/ and create symlink
+	ln -s /home/ec2-user/assestment1/www /var/www
+
+	check and reload configuration file for nginx sudo nginx -t &&  sudo systemctl reload nginx
+
+	run command for global configuration
+	
+	git config –global user.name “Vasiyl Pohomii”
+	git config –globl user.email vpohomii@playtika.com
+	git config –global core.editor vim
+
+	git remote add origin git@github.com:vpohomii/mdt-fork.git 
+	
+	Staging changes and create commit
+	Git add . ; git commit -m “Adding visible changes to a webpage”
+
+	Git push
+
+6.	Create file in vi ~/assestment1/.git/hooks/pre-commit with script.
+
+	#!/bin/bash
+	#Pre commit hook, that will catch all dirty word. Commit will be rejected if found at least one word from dictionary.
+	# start interating dirty words
+
+	WORDS='shit'
+
+	result=0
+
+	while read FILE ; do
+        #check that file not removed
+        if [[ -f $FILE ]]; then
+          RESULT=$(grep -i -m 1 ${WORDS} ${FILE}) 
+                if [[ ! -z $RESULT ]];then 
+                  echo "$FILE contains prohibided word: $RESULT"
+                  result=1
+                fi
+        fi
+	done <<EOT
+        $(git diff --cached --name-only)
+	EOT
+
+	if [ $result -ne 0 ]; then
+        echo "Aborting commit due to prohibided words"
+        exit ${result}
+	fi
+
+	Check that githooks working. Change index.html with adding “prohibided” word in meta tag. Git add . ; git commit -m “Checkout how hooks works”. Receive message from script. (script stdout attached in screenshots).
+
+7. 	#creating new branch
+	cd /home/ec2-user/assestment1
+	git checkout -b feature_1
+
+	#Saving existing nginx configuration
+	cp /etc/nginx/nginx.conf /etc/nginx/nginx.conf.save
+	#Change congig
+	sudo vi /etc/nginx/nginx.conf
+
+	addingd changes in nginx.conf 
+	change server name from _ to mdt_fork
+
+	#Caching static content within 1 hour
+	location ~* ^.+.(js|css|png|jpg|jpeg|gif|ico|woff|woff2|swf|ttf|svg)$ {
+	access_log off;
+    	expires 1h;
+	}
+
+	## Start: Size Limits & Buffer Overflows ##
+      client_body_buffer_size  1K;
+      client_header_buffer_size 1k;
+      client_max_body_size 1k;
+      large_client_header_buffers 2 1k;
+    ## END: Size Limits & Buffer Overflows ##
+
+    ## Start: Timeouts ##
+      client_body_timeout   10;
+      client_header_timeout 10;
+      send_timeout          10;
+    ## End: Timeouts ##
+	
+	saving configuration with ZZ
+
+	#check configuration
+	sudo nginx -t
+
+	#Reloading configuration of nginx 
+	sudo systemctl reload nginx
+
+	#copy new configuration file into assestment files
+	cp /etc/nginx/nginx.conf  ~/assestment1/assestment\ files/
+
+	changing run.sh
+	vi run.sh
+
+	git add . 
+	git commit -m “run.sh” 
+
+	#Merge feature_1 branch with master
+
+	git checkout master
+	Switched to branch 'master'
+	Your branch is up to date with 'origin/master'.
+
+	git merge feature_1 
+    Updating 9d01524..78cedcc
+    Fast-forward
+     assestment files/1.jpg      | Bin 0 -> 51503   bytes
+     assestment files/nginx.conf | 106  ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+    run.sh                      |   2 +-
+    3 files changed, 107 insertions(+), 1 deletion(-)
+    create mode 100644 assestment files/1.jpg
+    create mode 100644 assestment files/nginx.conf
+
+	## rebase
+
+	Git checkout -b feature_r
+	Make few commits on new branch
+
+	Vi README.md
+
+	Git add .
+	Git commit -m “README.md”
+
+	Vi run.sh
+	Git commit -a -m “once again run.sh”
+
+	Git checkout feature_1
+
+	git rebase feature_r 
+	Successfully rebased and updated refs/heads/feature_1.
+
+	git log -4 --graph
+	* commit 54c3d88a71ec7e3e12f0e31a52dc711eb241d875 (HEAD -> feature_1, feature_r)
+	| Author: Vasyl Pohomiy <vpohhomii@playtika.com>
+	| Date:   Sun Oct 10 22:05:53 2021 +0000
+	| 
+	|     once againe run.sh
+	| 
+	* commit 060d7ce11dd33139b6bafef1e0a38366ec1faea4
+	| Author: Vasyl Pohomiy <vpohhomii@playtika.com>
+	| Date:   Sun Oct 10 22:03:38 2021 +0000
+	| 
+	|     README.md
+	| 
+	* commit 78cedcc31a69a43a27ea30b4a47e75b48beaf572 (master)
+	| Author: Vasyl Pohomiy <vpohhomii@playtika.com>
+	| Date:   Sun Oct 10 21:56:59 2021 +0000
+	| 
+	|     run.sh
+	| 
+	* commit 2dba3d95766465861a476019573c0bb1acf6ed41
+	| Author: Vasyl Pohomiy <vpohhomii@playtika.com>
+	| Date:   Sun Oct 10 21:18:40 2021 +0000
+	| 
+	|     feature_1 branch
+
+	# squash all commits
+	
+	git reset --hard 4eb4a5bf83
+	git rebase -i 3565fe2d17
+	#changing all except firts handler from pick to squash 
+	  :2,$ s/pick/squash/g
+	# saving changes
+	ZZ
+
+	push all changes in to origin
+
+	git push -f origin master 
+	Enumerating objects: 72, done.
+	Counting objects: 100% (72/72), done.
+	Compressing objects: 100% (68/68), done.
+	Writing objects: 100% (71/71), 4.28 MiB | 5.16 MiB/s, done.
+	Total 71 (delta 3), reused 51 (delta 2), pack-reused 0
+	remote: Resolving deltas: 100% (3/3), done.
+	To github.com:vpohomii/mdt-fork.git
+	+ 9d01524...ba3cf59 master -> master (forced update)
+
+
+
+
+
+
