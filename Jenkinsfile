@@ -39,7 +39,7 @@ pipeline {
             }
         }
         stage("creating tar archive") {
-            steps {
+            steps { 
                 sh "tar --exclude='.git' --exclude='www/js' --exclude='www/css' -cf result.tar www/"
             }
         } 
