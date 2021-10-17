@@ -1,4 +1,4 @@
-pipeline {
+pipeline { 
      agent {
         label "agentVM1"
     }
