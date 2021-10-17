@@ -50,8 +50,8 @@ pipeline {
         }
 	stage("Publishings rtifacts to Artifactory") {
             steps {
-                sh "Nothing to do for now. But I'm keep going."
-		sh "Pss. Do you know some Ireland songs?"
+                echo "Nothing to do for now. But I'm keep going."
+		echo "Pss. Do you know some Ireland songs?"
             }
         }
     }
