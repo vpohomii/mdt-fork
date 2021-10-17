@@ -12,7 +12,7 @@ HTML, CSS, JS
 <h3>Resources</h3>
 <ul>
     <li><a href="http://materializecss.com/">Materialize</a></li>
-    <li><a href="http://www.materialpalette.com/">Material Design Colors</a></li>
+    <li><a href="http://www.materialpalette.com/">Material Design Colors</a></li> 
 </ul>
 
 <h2>License</h2>
