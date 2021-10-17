@@ -1,5 +1,5 @@
 pipeline {
-    agent {
+     agent {
         label "agentVM1"
     }
 
@@ -15,7 +15,7 @@ pipeline {
 
 
         }
-        stage("Check for npm and others version") {
+        stage("Working with NodeJS npm packages") {
             parallel("compressing") {
                 stage("clean-css") {
                     steps {
@@ -29,7 +29,7 @@ pipeline {
                     steps {
                         nodejs('NodeJS') {
                             sh '''#!/bin/bash -xe
-                                files=$(ls -A ugl | sed 's/.js//g')
+                                files=$(ls -A ugl | sed "s/\.js//g")
                                 for file in $files; do
                                         uglifyjs  ugl/$file.js -c -o umin/$file.min.js
                                 done'''
@@ -37,19 +37,16 @@ pipeline {
                     }
                 }
             }
-            stage("creating tar archive") {
-                steps {
-                    sh "tar --exclude='.git' --exclude='www/js' --exclude='www/css' -cf result.tar www/"
-                }
-
-            }
         }
+        stage("creating tar archive") {
+            steps {
+                sh "tar --exclude='.git' --exclude='www/js' --exclude='www/css' -cf result.tar www/"
+            }
+        } 
         stage("Artifacts") {
             steps {
-            archiveArtifacts allowEmptyArchive: true, artifacts: '**/*.tar', fingerprint: true, followSymlinks: false
+            archiveArtifacts allowEmptyArchive: true, artifacts: "**/*.tar", fingerprint: true, followSymlinks: false
             }
         }
     }
-}
-
-
+} 
