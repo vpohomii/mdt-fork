@@ -29,7 +29,7 @@ pipeline {
                     steps {
                         nodejs('NodeJS') {
                             sh '''#!/bin/bash -xe
-                                files=$(ls -A ugl | sed 's/\.js//g')
+                                files=$(ls -A ugl | sed 's/.js//g')
                                 for file in $files; do
                                         uglifyjs  ugl/$file.js -c -o umin/$file.min.js
                                 done'''
