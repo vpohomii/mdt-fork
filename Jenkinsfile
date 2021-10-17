@@ -17,7 +17,7 @@ pipeline {
                 stage("clean-css") {
                     steps {
                         nodejs('NodeJS') {
-                            sh "cleancss -b www/min/*.css -o www/css/*.css"
+			    sh "cleancss --batch --batch-suffix '.min' www/css/*.css \!www/css/*.min.css -o www/min/"
                         }
                     }
                 }
