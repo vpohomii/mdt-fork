@@ -45,7 +45,15 @@ pipeline {
         } 
         stage("Artifacts") {
             steps {
-            archiveArtifacts allowEmptyArchive: true, artifacts: "**/*.tar", fingerprint: true, followSymlinks: false
+
+                archiveArtifacts allowEmptyArchive: true, artifacts: "**/*.tar", fingerprint: true, followSymlinks: false
+            }
+        }
+	stage("Publishings rtifacts to Artifactory") {
+            steps {
+                echo "Nothing to do for now. But I'm keep going."
+            		echo "Pss. Do you know some Ireland songs?"
+
             }
         }
     }
