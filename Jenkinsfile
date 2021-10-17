@@ -56,7 +56,7 @@ pipeline {
 	stage("Publishings rtifacts to Artifactory") {
             steps {
                 echo "Nothing to do for now. But I'm keep going."
-            		echo "Pss. Do you know some Ireland songs?"
+            		echo "Pss. Do you know some Ireland songs?"   
 
             }
         }
