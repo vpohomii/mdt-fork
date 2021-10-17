@@ -19,7 +19,7 @@ pipeline {
                         }
 			nodejs('NodeJS') {
                             sh '''#!/bin/bash -xe
-                            cleancss --batch --batch-suffix '.min' www/css/*.css \!www/css/*.min.css -o www/min/'''
+                            cleancss --batch --batch-suffix '.min' www/css/*.css !www/css/*.min.css -o www/min/'''
                     }
                 }
                 stage("uglify-js") {
