@@ -1,40 +1,52 @@
 pipeline {
-    agent {
+     agent {
         label "agentVM1"
     }
+
     tools {
     nodejs 'NodeJS'
     }
 
     stages {
         stage("checkout") {
-            steps {
+            steps { 
                 checkout scm
             }
+
+
         }
-        stage("Check for npm and others version") {
+        stage("Working with NodeJS npm packages") {
             parallel("compressing") {
                 stage("clean-css") {
                     steps {
                         nodejs('NodeJS') {
-                            sh "cleancss -b www/min/*.css -o www/css/*.css"
+                            sh '''#!/bin/bash -xe
+                            cleancss --batch --batch-suffix '.min' www/css/*.css !www/css/*.min.css -o www/min/'''
                         }
                     }
                 }
                 stage("uglify-js") {
                     steps {
                         nodejs('NodeJS') {
-                            println  "Hello World"
+                            sh '''#!/bin/bash -xe
+                                files=$(ls -A www/js | sed "s/.js//g")
+                                for file in $files; do
+                                        uglifyjs  www/js/$file.js -c -o www/min/$file.min.js
+                                done'''
                         }
-                        sh "tar --exclude='.git' --exclude='www/js' --exclude='www/css' -cf result.tar www/"
                     }
-                }    
+                }
             }
         }
+        stage("creating tar archive") {
+            steps {
+                sh "tar --exclude='.git' --exclude='www/js' --exclude='www/css' -cf result.tar www/"
+            }
+        } 
         stage("Artifacts") {
             steps {
-            archiveArtifacts allowEmptyArchive: true, artifacts: '**/*.tar', fingerprint: true, followSymlinks: false
+            archiveArtifacts allowEmptyArchive: true, artifacts: "**/*.tar", fingerprint: true, followSymlinks: false
             }
         }
     }
-}
+} 
