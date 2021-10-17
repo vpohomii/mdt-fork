@@ -2,6 +2,10 @@ pipeline {
      agent {
         label "agentVM1"
     }
+    
+    triggers {
+        githubPush()
+    }
 
     tools {
     nodejs 'NodeJS'
