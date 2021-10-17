@@ -35,7 +35,7 @@ pipeline {
                             sh '''#!/bin/bash -xe
                                 files=$(ls -A www/js | sed "s/.js//g")
                                 for file in $files; do
-                                        uglifyjs  www/js/$file.js -c -o www/min/$file.min.js
+                                        uglifyjs  www/js/$file.js -c -o www/min/$file.min.js    
                                 done'''
                         }
                     }
