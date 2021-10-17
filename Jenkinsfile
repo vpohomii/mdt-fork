@@ -4,7 +4,7 @@ pipeline {
     }
     
     triggers {
-        githubPush()
+         pollSCM ('0 * * * *')
     }
 
     tools {
